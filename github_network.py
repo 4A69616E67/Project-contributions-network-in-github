@@ -21,8 +21,6 @@ page_condition="page="+Args.page if Args.page else "page=1"
 sort_condition='sort=stars'
 per_page_condition='per_page=100'
 url='https://api.github.com/search/repositories?q=language:'+language_condition+'&'+sort_condition+'&'+per_page_condition+'&'+page_condition
-# r=requests.get(BASE_URL+"/user",auth=("4A69616E67","jh1994!@#"))
-# print(requests.get(BASE_URL+"/rate_limit").text)
 response_dict = requests.get(url).json()
 contributors_hash=dict()
 for i in range(len(response_dict['items'])):
@@ -49,22 +47,4 @@ for i in range(len(response_dict['items'])):
     if(len(contributors_hash[project_name])>=1):
         print(contributors_hash[project_name].pop()),
     print()
-        
-
-
-# import matplotlib.pyplot as plt
-# import string
-# file="wiki-node.csv"
-# f=open(file,'r')
-# L=dict()
-# f.readline()
-# for line in f:
-#     key=line.split(",")[4].replace("\n","")
-#     if L.has_key(key):
-#         L[key]+=1
-#     else:
-#         L[key]=1
-        
-# # plt.numpy.histogram(L)
-# plt.hist(L.values(),bins=50,range=(25,200))
-# plt.show()
+    
