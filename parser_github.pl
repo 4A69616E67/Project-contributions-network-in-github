@@ -1,26 +1,73 @@
-open(IN,"github.csv");
-open(EDGE,">github.edge.csv");
-open(NODE,">github.node.csv");
+#author 4A69616E67
+use Getopt::Long;
+use Switch;
+$usage_str="
+usage:perl $0 [option] <infile>
+--prefix|-p    out prefix
+";
+my($infile,$prefix,@project_list,@owner_list,@star_list,@language_list,@contributors_list);
+GetOptions("prefix|p=s"=>\$prefix);
+if(!$ARGV[0])
+{
+    print $usage_str;
+    exit;
+}
+$infile=$ARGV[0];
+open(IN,$infile);
+open(EDGE,">$prefix.edge.csv");
+open(NODE,">$prefix.node.csv");
 print EDGE "source\ttarget\tweight\n";
 print NODE "id\tlabel\tstar_count\tlanguage\n";
 %hash=();
 %node=();
+print "read data ......\n";
 while($line=<IN>)
 {
     chomp $line;
-    @str=split(/:|,/,$line);
-    pop(@str);
-    @title=split(/\*/,shift(@str));
-    $project_name=$title[0];
-    $star_count=$title[1];
-    $language=$title[2];
-    print NODE $project_name."\t".$project_name."\t".$star_count."\t".$language."\n";
-    foreach $i (@str[1..$#str])
+    @str=split(/\s*:\s*/,$line);
+    switch($str[0])
     {
-        push(@{$hash{$project_name}},$i);
+        case "Project"
+        {
+            push(@project_list,$str[1]);
+            next;
+        }
+        case "Owner"
+        {
+            push(@owner_list,$str[1]);
+            next;
+        }
+        case "Star"
+        {
+            push(@star_list,$str[1]);
+            next;
+        }
+        case "Language"
+        {
+            push(@language_list,$str[1]);
+            next;
+        }
+        case "Contributors"
+        {
+            push(@contributors_list,$str[1]);
+            next;
+        }
+    }
+}
+#----------------------------------------------------
+print "print node file\n";
+for($i=0;$i<scalar(@project_list);$i++)
+{
+    print NODE $project_list[$i]."\t".$project_list[$i]."\t".$star_list[$i]."\t".$language_list[$i]."\n";
+    @str=split(/\s*,\s*/,$contributors_list[$i]);
+    foreach $j (@str)
+    {
+        push(@{$hash{$project_list[$i]}},$j);
     }
 }
 close(NODE);
+#---------------------------------------------------
+print "print edge file\n";
 @name_list=keys(%hash);
 for($i=0;$i<scalar(@name_list)-1;$i++)
 {
@@ -46,30 +93,3 @@ for($i=0;$i<scalar(@name_list)-1;$i++)
     }
 }
 close(EDGE);
-
-open(IN,"Datas.csv");
-open(OUT,">Datas.edge.csv");
-print OUT "source\ttarget\tweight\n";
-$line=<IN>;
-chomp $line;
-@name=split(/,/,$line);
-shift(@name);
-$i=0;
-while($line=<IN>)
-{
-    chomp $line;
-    @{$num[$i]}=split(/,/,$line);
-    shift(@{$num[$i]});
-    $i++;
-}
-for($i=0;$i<scalar(@name);$i++)
-{
-    for($j=$i+1;$j<scalar(@name);$j++)
-    {
-        if($num[$i][$j]>0.1)
-        {
-            print OUT $name[$i]."\t".$name[$j]."\t".$num[$i][$j]."\n";
-        }
-    }
-}
-close(OUT);

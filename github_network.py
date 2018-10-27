@@ -1,3 +1,4 @@
+#author 4A69616E67
 import requests
 import sys
 import argparse
@@ -7,7 +8,8 @@ def getargs():
     parser.add_argument('-c', '--account', help="your github account")
     parser.add_argument('-w', '--password', help="your github password")
     parser.add_argument('-l', '--language', help='the language you want to search')
-    parser.add_argument('-p', '--page', help='the number of page you want to show')
+    parser.add_argument('-g', '--page', help='the number of page you want to show')
+    parser.add_argument('-p', '--prefix', help='the prefix of output')
     return parser.parse_args()
 #per_page=100 print 100 item each page
 #page=1 print the first page
@@ -15,7 +17,8 @@ def getargs():
 BASE_URL = 'https://api.github.com'
 Args=getargs()
 account=Args.account
-password=Args.password
+password = Args.password
+prefix=Args.prefix
 language_condition=Args.language if Args.language else "Python"
 page_condition="page="+Args.page if Args.page else "page=1"
 sort_condition='sort=stars'
@@ -46,5 +49,5 @@ for i in range(len(response_dict['items'])):
         print(contributors_hash[project_name][j]+","),
     if(len(contributors_hash[project_name])>=1):
         print(contributors_hash[project_name].pop()),
-    print()
+    print
     
